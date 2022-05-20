@@ -1,7 +1,11 @@
-version = 1.0
+version = 1.1
 
-[general]
+[user_creation]
 default_password = h&K7h1iB89a1vakI3
+users_file = /mnt/ftp/admin/users
+
+[backup]
+backup_groups_file = /var/backup_groups
 
 [home_template]
 
