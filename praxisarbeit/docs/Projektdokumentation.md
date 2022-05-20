@@ -127,8 +127,12 @@ Der Backup Prozess:
 
 ### Konfigurationsdateien
 
-TODO: Definieren sie welche Parameter in welchen Konfigurationsdateien
-gespeichert werden.
+Parameter | Wert | Beschreibung
+--------- | ---- | ------------
+version   | 1.0  | Version des Konfigurationsformat.
+general.default_password | String | Standardpasswort für Nutzeraccounts.
+home_template.\<group-name> | | Beinhaltet Konfiguration für Home-Templates.
+home_template.\<group-name>.dir | Pfad zum Template-Verzeichnis.
 
 ## Abgrenzungen zum Lösungsdesign
 
