@@ -1,0 +1,16 @@
+version = 1.0
+
+[general]
+default_password = h&K7h1iB89a1vakI3
+
+[home_template]
+
+	[home_template.admin]
+	dir = /var/home_templates/admin
+
+	[home_template.group2]
+	dir = /home/template_user
+
+	[home_template.supporter]
+	dir = /var/home_templates/supporter_template
+
