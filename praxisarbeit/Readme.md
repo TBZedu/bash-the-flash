@@ -9,7 +9,8 @@ Erstellen sie 2 Skripte die folgende Aufgaben erfüllen
 Skript zum automatischen erstellen von Unix-Usern und default passwort setzen, welches beim ersten login geändert werden muss. Es sollen nur nicht existierende User erstellt werden. User-Home-Verzeichnis mit Skeleton-Template-Umgebung einrichten. Es sollen keine existierenden Dateien überschrieben werden.
 #### Muss-Kritierien
 * Es soll anhand von einem Input file in welchem folgende Angaben der zu erstellenden User erfasst sind User erstellen: 
-	```
+
+```
 <username> <groupname> <vorname nachname>
 ```
 
