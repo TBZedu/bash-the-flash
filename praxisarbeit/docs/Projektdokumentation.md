@@ -71,7 +71,7 @@ Long Flag (--) | Short Flag (-) | Argumente | Beschreibung
 -------------- | -------------- | --------- | ------------
 config         |                | Dateipfad | Die zu verwendende Konfigurationsdatei.
 default-pw     | pw             | String    | Bestimmt das Standardpasswort für alle Benutzeraccounts welche erstellt werden.
-home-template  | ht             | group:dir | Definiert das Verzeichnis welches das Home-Template einer bestimmten Gruppe beinhaltet. Mehrere Touples (group:dir) können übergeben werden.
+home-template  | ht             | group:dir | Definiert das Verzeichnis welches das Home-Template einer bestimmten Gruppe beinhaltet. Mehrere Tupels (group:dir) können übergeben werden.
 verbose        | v              |           | Zeige verboser Output.
 version        |                |           | Zeige Version an und beende sofort.
 
@@ -83,7 +83,7 @@ Backup Nutzer Home-Verzeichnisse.
 # bub <arguments> <input-file>
 ```
 
-Das input-file muss eine Datei nach dem folgenden Format entsprechen:
+Das input-file muss einer Datei nach dem folgenden Format entsprechen:
 
 ```
 <groupname1>
@@ -121,7 +121,9 @@ Exit Code | Beschreibung
 
 ### Ablauf der Automation
 
-TODO: Hier kommt ihr UML-Activity Diagramm
+Der Backup Prozess:
+
+![Activity Diagram Backup Process](activity_backup.drawio.svg)
 
 ### Konfigurationsdateien
 
