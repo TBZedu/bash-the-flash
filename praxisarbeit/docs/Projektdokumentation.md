@@ -121,6 +121,10 @@ Exit Code | Beschreibung
 
 ### Ablauf der Automation
 
+Der User Erstellungsprozess:
+
+![Activity Diagram Create Process](create_user.drawio.svg)
+
 Der Backup Prozess:
 
 ![Activity Diagram Backup Process](activity_backup.drawio.svg)
