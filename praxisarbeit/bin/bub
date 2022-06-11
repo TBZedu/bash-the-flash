@@ -5,8 +5,10 @@
 # sudo bub -v D
 # sudo bub --config hello/world --group wheel --group=root -d /backup/homes\
 #   -e hello -e world --pattern hey -k 3 -v
+# sudo bub -e hello,world -e '*.bash*'
+# sudo bub --config=custom.env
 
-VERSION=1.0.0
+VERSION=1.0.1
 LOGLEVEL=${LOGLEVEL:-W}  # Set default log level
 CWD=$(pwd)               # Current working directory
 cd $(dirname $0)
@@ -16,20 +18,29 @@ BASENAME=$(basename $0)  # Script name
 TMPDIR=/tmp/$BASENAME.$$ # Temporary directory
 ETCDIR=$BINDIR/../etc    # Config directory
 LOGFILE=$BINDIR/../var/bub.log
+PARAM_LINE="$BASENAME $@"
 
 usage() {
-    echo "$BASENAME [<arguments>] [<inputfile>]" >&2
-    echo 'inputfile: file contains group names, one per line' >&2
-    echo 'arguments:' >&2
-    echo '    -h|--help                    : print this help'
-    echo '    --version                    : show version and exit'
-    echo '    --config=FILE                : path to config file'
-    echo '    -g=GROUP|--group=GROUP       : group to archive, flag may be passed multiple times'
-    echo '    -d=DIR|--directory=DIR       : save backup to directory'
-    echo '    -e=FILE|--exclude=FILE       : file to exclude from backup, flag may be passed multiple times'
-    echo '    -p=NAME|--pattern=NAME       : output file name'
-    echo '    -k|--keep                    : number of backups to keep, must be greater than 0'
-    echo '    -v[=LEVEL]|--verbose[=LEVEL] : log verbosity (D|I|W|E), if no LEVEL provided, then D'
+    echo 'SYNOPSIS:'                                                                                       >&2
+    echo "    $BASENAME [<arguments>] [<inputfile>]"                                                       >&2
+    echo '    inputfile: file contains group names, one per line'                                          >&2
+    echo ''                                                                                                >&2
+    echo 'ARGUMENTS:'                                                                                      >&2
+    echo '    -h|--help                    print this help'                                                >&2
+    echo '    --version                    show version and exit'                                          >&2
+    echo '    --config=FILE                path to config file'                                            >&2
+    echo '    -g=GROUP|--group=GROUP       group to archive, flag may be passed multiple times'            >&2
+    echo '    -d=DIR|--directory=DIR       save backup to directory'                                       >&2
+    echo '    -e=FILE|--exclude=FILE       file to exclude from backup, flag may be passed multiple times' >&2
+    echo '    -p=NAME|--pattern=NAME       output file name'                                               >&2
+    echo '    -k|--keep                    number of backups to keep, must be greater than 0'              >&2
+    echo '    -v[=LEVEL]|--verbose[=LEVEL] log verbosity (D|I|W|E), if no LEVEL provided, then D'          >&2
+    echo ''                                                                                                >&2
+    echo 'EXIT CODES:'                                                                                     >&2
+    echo '    0   Success'                                                                                 >&2
+    echo '    1   Require root permissions'                                                                >&2
+    echo '    3   Invalid configuration file'                                                              >&2
+    echo '    255 Other error'                                                                             >&2
 }
 
 version() {
@@ -67,13 +78,6 @@ log() {
         *) echo -e "$DATE:${BLU}UNKNOWN${NC}:$*" | tee -a $LOGFILE ;;
     esac
 }
-
-param_line="$BASENAME $@"
-
-if [ $EUID -ne 0 ]; then
-    log E "insufficient permissions, script must be run as root"
-    exit 1
-fi
 
 # Parse flags
 helpflag=
@@ -143,7 +147,7 @@ for i in "$@"; do
             shift
             ;;
         -v=*|--verbose=*)
-            verbosity="${i#*=}"
+            LOGLEVEL="${i#*=}"
             shift
             ;;
         -v|--verbose)
@@ -161,7 +165,25 @@ done
 mkdir -p $TMPDIR
 mkdir -p $(dirname $LOGFILE)
 
-log D "Invoked: $param_line"
+log D "Invoked: $PARAM_LINE"
+log D $(version)
+
+# Show help and exit
+if [ $helpflag ]; then
+    usage
+    exit 0
+fi
+
+# Show version and exit
+if [ $versionflag ]; then
+    version
+    exit 0
+fi
+
+if [ $EUID -ne 0 ]; then
+    log E "insufficient permissions, script must be run as root"
+    exit 1
+fi
 
 # Load config
 if [ -z ${config_file} ]; then
@@ -179,20 +201,6 @@ else
         exit 3
     fi
 fi
-
-# Show help and exit
-if [ $helpflag ]; then
-    usage
-    exit 0
-fi
-
-# Show version and exit
-if [ $versionflag ]; then
-    version
-    exit 0
-fi
-
-log I $(version)
 
 if [ -n "$output" ]; then
     BACKUP_DIR=$(realpath $output)
@@ -265,7 +273,7 @@ fi
 
 if [ -f "$BACKUP_NAME.tar" ]; then
     log E "archive with similar name already exists"
-    log I "use a unique/changing name in BACKUP_NAME, eg. the current date"
+    log E "use a unique/changing name in BACKUP_NAME, eg. the current date"
     exit 255
 fi
 
@@ -276,7 +284,12 @@ do
     exclude_flags=("--exclude=$i $exclude_flags")
 done
 
-if tar -cvf "$BACKUP_NAME.tar" --exclude-ignore-recursive=bub.ignore $exclude_flags -T $backup_dirs --force-local > /dev/null 2>&1
+if tar -cvf "$BACKUP_NAME.tar"\
+    --exclude-ignore-recursive=bub.ignore\
+    $exclude_flags\
+    -T $backup_dirs\
+    --force-local\
+    > /dev/null 2>&1
 then
     log I "backup saved to $(realpath $BACKUP_DIR)/$BACKUP_NAME.tar"
 else
@@ -288,8 +301,8 @@ if [ -n "$keep" ]; then
     BACKUP_KEEP_MAX=$keep
 fi
 
-if [ -z $BACKUP_KEEP_MAX ] || [ $BACKUP_KEEP_MAX -lt 1 ]; then
-    log I "backup max unset, keeping all backups"
+if [ -z $BACKUP_KEEP_MAX ] || [ $BACKUP_KEEP_MAX -le 0 ]; then
+    log W "backup max unset, keeping all backups"
 else
     # Delete old backups
     log I "only keeping latest $BACKUP_KEEP_MAX backups"
