@@ -68,6 +68,8 @@ log() {
     esac
 }
 
+param_line="$BASENAME $@"
+
 if [ $UID -ne 0 ]; then
     log E "insufficient permissions, script must be run as root"
     exit 1
@@ -157,6 +159,9 @@ for i in "$@"; do
 done
 
 mkdir -p $TMPDIR
+mkdir -p $(dirname $LOGFILE)
+
+log D "Invoked: $param_line"
 
 # Load config
 if [ -z ${config_file} ]; then
