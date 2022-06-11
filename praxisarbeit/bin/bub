@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-VERSION=0.0.2
+# Examples:
+# sudo LOGLEVEL=D bub
+# sudo bub -v D
+# sudo bub --config hello/world --group wheel --group=root -d /backup/homes\
+#   -e hello -e world --pattern hey -k 3 -v
+
+VERSION=0.0.3
 LOGLEVEL=${LOGLEVEL:-W}  # Set default log level
 CWD=$(pwd)               # Current working directory
 cd $(dirname $0)
@@ -11,13 +17,19 @@ TMPDIR=/tmp/$BASENAME.$$ # Temporary directory
 ETCDIR=$BINDIR/../etc    # Config directory
 LOGFILE=$BINDIR/../var/bub.log
 
-mkdir -p $TMPDIR
-. $ETCDIR/bucb.env
-
 usage() {
     echo "$BASENAME [<arguments>] [<inputfile>]" >&2
-    echo 'inputfile: Beinhaltet Namen der zu sichernden Gruppen, jeweils ein Name pro Zeile.' >&2
-    echo 'arguments: Erlauben das Überschreiben von Konfig-Parametern.' >&2
+    echo 'inputfile: file contains group names, one per line' >&2
+    echo 'arguments:' >&2
+    echo '    -h|--help                    : print this help'
+    echo '    --version                    : show version and exit'
+    echo '    --config=FILE                : path to config file'
+    echo '    -g=GROUP|--group=GROUP       : group to archive, flag may be passed multiple times'
+    echo '    -d=DIR|--directory=DIR       : save backup to directory'
+    echo '    -e=FILE|--exclude=FILE       : file to exclude from backup, flag may be passed multiple times'
+    echo '    -p=NAME|--pattern=NAME       : output file name'
+    echo '    -k|--keep                    : number of backups to keep'
+    echo '    -v[=LEVEL]|--verbose[=LEVEL] : log verbosity (D|I|W|E), if no LEVEL provided, then D'
 }
 
 version() {
@@ -56,27 +68,125 @@ log() {
     esac
 }
 
+# Parse flags
 helpflag=
 versionflag=
-while getopts vh optvar ; do
-    case $optvar in
-        v) versionflag=1 ;;
-        h) helpflag=1 ;;
-        *) usage ; exit 1 ;;
+config_file=
+archive_groups=
+output=
+excludes=
+pattern=
+keep=
+for i in "$@"; do
+    case $i in
+        -h|--help)
+            helpflag=1
+            break
+            ;;
+        --version)
+            versionflag=1
+            break
+            ;;
+        --config=*)
+            config_file="${i#*=}"
+            shift
+            ;;
+        --config)
+            config_file="$2"
+            shift
+            ;;
+        -g=*|--group=*)
+            archive_groups=("$archive_groups,${i#*=}")
+            shift
+            ;;
+        -g|--group)
+            archive_groups=("$archive_groups,$2")
+            shift
+            ;;
+        -d=*|--directory=*)
+            output="${i#*=}"
+            shift
+            ;;
+        -d|--directory)
+            output="$2"
+            shift
+            ;;
+        -e=*|--exclude=*)
+            excludes=("$excludes,${i#*=}")
+            shift
+            ;;
+        -e|--exclude)
+            excludes=("$excludes,$2")
+            shift
+            ;;
+        -p=*|--pattern=*)
+            pattern="${i#*=}"
+            shift
+            ;;
+        -p|--pattern)
+            pattern="$2"
+            shift
+            ;;
+        -k*=|keep=*)
+            keep="${i#*=}"
+            shift
+            ;;
+        -k|keep)
+            keep="$2"
+            shift
+            ;;
+        -v=*|--verbose=*)
+            verbosity="${i#*=}"
+            shift
+            ;;
+        -v|--verbose)
+            if [[ $2 == "D" || $2 == "I" || $2 == "W" || $2 == "E" ]]; then
+                LOGLEVEL=$2
+            else
+                LOGLEVEL=D
+            fi
+            shift
+            ;;
+        *) shift ;;
     esac
 done
 
+mkdir -p $TMPDIR
+
+# Load config
+if [ -z ${config_file} ]; then
+    if [ -f "$ETCDIR/bucb.env" ]; then
+        . $ETCDIR/bucb.env
+    else
+        log E "no configuration file"
+        exit 255
+    fi
+else
+    if [ -f "$config_file" ]; then
+        . $config_file
+    else
+        log E "invalid configuration file path provided"
+        exit 255
+    fi
+fi
+
+# Show help and exit
 if [ $helpflag ]; then
     usage
     exit 0
 fi
 
+# Show version and exit
 if [ $versionflag ]; then
     version
     exit 0
 fi
 
 log I $(version)
+
+if [ -n "$output" ]; then
+    BACKUP_DIR=$(realpath $output)
+fi
 
 # Config might contain relative paths
 cd $ETCDIR
@@ -87,15 +197,21 @@ if [[ ! -d "$BACKUP_DIR" ]]; then
     exit 255
 fi
 
-# Read backup groups
-backup_dirs=$TMPDIR/backup_dirs
-while IFS= read -r group; do
+if [ -z ${archive_groups} ]; then
+    if [[ ! -f "$BACKUP_GROUPS_FILE" ]]; then
+        log E "no groups provided"
+        exit 255
+    fi
+fi
+
+create_directory_listing() {
+    group=$1
     if [ $(getent group $group) ]; then
         # Get users from group
         userstring=$(getent group $group | cut -d ':' -f 4)
         IFS=',' read -r -a users <<< $userstring
         log I "found ${#users[@]} users in $group group."
-        [ -n "${users[*]}" ] && log D "the users are: ${users[*]}" || continue
+        [ -n "${users[*]}" ] && log D "the users are: ${users[*]}" || return
         # Get users home dirs
         for i in "${users[@]}"
         do
@@ -107,13 +223,35 @@ while IFS= read -r group; do
     else
         log W "group $group does not exist"
     fi
-done < $BACKUP_GROUPS_FILE
+}
+
+# Read backup groups
+backup_dirs=$TMPDIR/backup_dirs
+if [ -z ${archive_groups} ]; then
+    while IFS= read -r group; do
+        create_directory_listing "$group"
+    done < $BACKUP_GROUPS_FILE
+else
+    for i in ${archive_groups//,/ }
+    do
+        create_directory_listing "$i"
+    done
+fi
+
+if [ ! -s $backup_dirs ]; then
+    log W "no users to backup"
+    exit 0
+fi
 
 cd $BACKUP_DIR
 
 # Create backups using tar
-DEFAULT_BACKUP_NAME="$(date '+%Y.%m.%d-%H:%M:%S')-backup"
-BACKUP_NAME=${BACKUP_NAME:-$DEFAULT_BACKUP_NAME}
+if [ -n "$pattern" ]; then
+    BACKUP_NAME=$pattern
+else
+    DEFAULT_BACKUP_NAME="$(date '+%Y.%m.%d-%H:%M:%S')-backup"
+    BACKUP_NAME=${BACKUP_NAME:-$DEFAULT_BACKUP_NAME}
+fi
 
 if [ -f "$BACKUP_NAME.tar" ]; then
     log E "archive with similar name already exists"
@@ -121,7 +259,14 @@ if [ -f "$BACKUP_NAME.tar" ]; then
     exit 255
 fi
 
-if tar -cvf "$BACKUP_NAME.tar" -T $backup_dirs --force-local > /dev/null 2>&1
+# Build flag string for tar's --exclude=PATTERN
+exclude_flags=
+for i in ${excludes//,/ }
+do
+    exclude_flags=("--exclude=$i $exclude_flags")
+done
+
+if tar -cvf "$BACKUP_NAME.tar" --exclude-ignore-recursive=bub.ignore $exclude_flags -T $backup_dirs --force-local > /dev/null 2>&1
 then
     log I "backup saved to $(realpath $BACKUP_DIR)/$BACKUP_NAME.tar"
 else
@@ -129,15 +274,23 @@ else
     exit 255
 fi
 
-# Delete old backups
-log I "only keeping latest $BACKUP_KEEP_MAX backups"
-nob=$(ls -1 . | wc -l)
-while [ $nob -gt $BACKUP_KEEP_MAX ]; do
-    oldest=$(ls -1t | tail -1)
-    rm $oldest
-    log D "deleted oldest backup $oldest"
+if [ -n "$keep" ]; then
+    BACKUP_KEEP_MAX=$keep
+fi
+
+if [ -z $BACKUP_KEEP_MAX ] || [ $BACKUP_KEEP_MAX -lt 1 ]; then
+    log I "backup max unset, keeping all backups"
+else
+    # Delete old backups
+    log I "only keeping latest $BACKUP_KEEP_MAX backups"
     nob=$(ls -1 . | wc -l)
-done
+    while [ $nob -gt $BACKUP_KEEP_MAX ]; do
+        oldest=$(ls -1t | tail -1)
+        rm $oldest
+        log D "deleted oldest backup $oldest"
+        nob=$(ls -1 . | wc -l)
+    done
+fi
 
 log I "logs written to $(realpath $LOGFILE)"
 log I "archive written, $(stat --printf='%s' "$BACKUP_NAME.tar")B"
