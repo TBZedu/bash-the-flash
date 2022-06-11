@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+
+VERSION=0.0.2
+LOGLEVEL=${LOGLEVEL:-W}  # Set default log level
+CWD=$(pwd)               # Current working directory
+cd $(dirname $0)
+BINDIR=$(pwd)            # Script location
+cd $CWD
+BASENAME=$(basename $0)  # Script name
+TMPDIR=/tmp/$BASENAME.$$ # Temporary directory
+ETCDIR=$BINDIR/../etc    # Config directory
+LOGFILE=$BINDIR/../var/bub.log
+
+mkdir -p $TMPDIR
+. $ETCDIR/bucb.env
+
+usage() {
+    echo "$BASENAME [<arguments>] [<inputfile>]" >&2
+    echo 'inputfile: Beinhaltet Namen der zu sichernden Gruppen, jeweils ein Name pro Zeile.' >&2
+    echo 'arguments: Erlauben das Überschreiben von Konfig-Parametern.' >&2
+}
+
+version() {
+    echo "bub - Bulk User Backup v$VERSION"
+}
+
+log() {
+    local RED='\033[0;31m'
+    local YEL='\033[1;33m'
+    local WHI='\033[1;37m'
+    local CYA='\033[0;36m'
+    local BLU='\033[0;34m'
+    local NC='\033[0m'
+    DATE=$(date '+%Y.%m.%d %H:%M:%S')
+    LEVEL=$1
+    shift # Shift all parameters n+1, so that we can echo all further
+          # parameters without echoing the log level (which was stored in $1)
+    case $LEVEL in
+        D)
+            case $LOGLEVEL in
+                D) echo -e "$DATE:${CYA}DEBUG${NC}:$*" | tee -a $LOGFILE ;;
+            esac
+            ;;
+        I)
+            case $LOGLEVEL in
+                D|I) echo -e "$DATE:${WHI}INFO${NC}:$*" | tee -a $LOGFILE ;;
+            esac
+            ;;
+        W)
+            case $LOGLEVEL in
+                D|I|W) echo -e "$DATE:${YEL}WARNING${NC}:$*" | tee -a $LOGFILE ;;
+            esac
+            ;;
+        E) echo -e "$DATE:${RED}ERROR${NC}:$*" | tee -a $LOGFILE ;;
+        *) echo -e "$DATE:${BLU}UNKNOWN${NC}:$*" | tee -a $LOGFILE ;;
+    esac
+}
+
+helpflag=
+versionflag=
+while getopts vh optvar ; do
+    case $optvar in
+        v) versionflag=1 ;;
+        h) helpflag=1 ;;
+        *) usage ; exit 1 ;;
+    esac
+done
+
+if [ $helpflag ]; then
+    usage
+    exit 0
+fi
+
+if [ $versionflag ]; then
+    version
+    exit 0
+fi
+
+log I $(version)
+
+# Config might contain relative paths
+cd $ETCDIR
+
+# Check if backup dir exists
+if [[ ! -d "$BACKUP_DIR" ]]; then
+    log E "backup directory does not exist"
+    exit 255
+fi
+
+# Read backup groups
+backup_dirs=$TMPDIR/backup_dirs
+while IFS= read -r group; do
+    if [ $(getent group $group) ]; then
+        # Get users from group
+        userstring=$(getent group $group | cut -d ':' -f 4)
+        IFS=',' read -r -a users <<< $userstring
+        log I "found ${#users[@]} users in $group group."
+        [ -n "${users[*]}" ] && log D "the users are: ${users[*]}" || continue
+        # Get users home dirs
+        for i in "${users[@]}"
+        do
+            homedir=$(getent passwd $i | cut -d ':' -f 6)
+            log D "$i's home is $homedir"
+            # Write home dir into file
+            echo $homedir >> $backup_dirs
+        done
+    else
+        log W "group $group does not exist"
+    fi
+done < $BACKUP_GROUPS_FILE
+
+cd $BACKUP_DIR
+
+# Create backups using tar
+DEFAULT_BACKUP_NAME="$(date '+%Y.%m.%d-%H:%M:%S')-backup"
+BACKUP_NAME=${BACKUP_NAME:-$DEFAULT_BACKUP_NAME}
+
+if [ -f "$BACKUP_NAME.tar" ]; then
+    log E "archive with similar name already exists"
+    log I "use a unique/changing name in BACKUP_NAME, eg. the current date"
+    exit 255
+fi
+
+if tar -cvf "$BACKUP_NAME.tar" -T $backup_dirs --force-local > /dev/null 2>&1
+then
+    log I "backup saved to $(realpath $BACKUP_DIR)/$BACKUP_NAME.tar"
+else
+    log E "tar failed"
+    exit 255
+fi
+
+# Delete old backups
+log I "only keeping latest $BACKUP_KEEP_MAX backups"
+nob=$(ls -1 . | wc -l)
+while [ $nob -gt $BACKUP_KEEP_MAX ]; do
+    oldest=$(ls -1t | tail -1)
+    rm $oldest
+    log D "deleted oldest backup $oldest"
+    nob=$(ls -1 . | wc -l)
+done
+
+log I "logs written to $(realpath $LOGFILE)"
+log I "archive written, $(stat --printf='%s' "$BACKUP_NAME.tar")B"
+log I "total $(du -sh . | cut -f 1)"
+echo "-----------------------------------------------------------------------"\
+    >> $LOGFILE
