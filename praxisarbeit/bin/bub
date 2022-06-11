@@ -70,7 +70,7 @@ log() {
 
 param_line="$BASENAME $@"
 
-if [ $UID -ne 0 ]; then
+if [ $EUID -ne 0 ]; then
     log E "insufficient permissions, script must be run as root"
     exit 1
 fi
