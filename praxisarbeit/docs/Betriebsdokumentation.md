@@ -35,7 +35,7 @@ cd m122_praxisarbeit-0.0.1-alpha
 ### Konfiguration
 
 Eine Beispielkonfiguration mit Beschreibung findet sich unter `etc/bucb.env`.
-[Repo Link](../etc/bucb.env)
+([Repo Link](../etc/bucb.env))
 
 Der Inhalt wird als Bash-Skript interpretiert, die Konfigurations-Syntax muss
 also valide Bash-Syntax sein.
