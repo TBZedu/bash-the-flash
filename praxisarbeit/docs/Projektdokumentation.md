@@ -2,7 +2,7 @@
 title: Projekt Dokumentation
 author: Conese Dillan, van Loo Colin
 date: 2022-05-20
-lastmod: 2022-05-20
+lastmod: 2022-06-17
 ---
 
 # Projekt Dokumentation
@@ -140,6 +140,12 @@ home_template.\<group-name>.dir | Pfad zum Template-Verzeichnis.
 
 ## Abgrenzungen zum Lösungsdesign
 
-TODO: Nachdem das Programm verwirklicht wurde hier die unterschiede von der
-Implemenatino zum Lösungsdesign beschreiben (was wurde anders gemacht, was
-wurde nicht gemacht, was wurde zusaetzlich gemacht)
+### Konfiguration
+
+Als Konfigurationsformat nutzten wir Bash-Syntax anstatt wie ursprünglich
+geplant TOML. Dies vereinfacht das Einlesen von Konfigurationsparameter
+erheblich, da die Datei lediglich ge`source`d  werden muss, kein Parsen ist
+notwendig.
+
+Das entsprechende PR kann
+[hier](https://github.com/TBZedu/m122_praxisarbeit/pull/1) gefunden werden.
