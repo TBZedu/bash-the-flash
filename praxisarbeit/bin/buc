@@ -1,0 +1,30 @@
+#!/bin/bash 
+
+cwd=`pwd`
+cd `dirname $0`	
+BINDIR=`pwd`
+cd $cwd	
+BASENAME=`basename $0`
+LOGDIR=$BINDIR/../var/log/bat
+ETCDIR=$BINDIR/../etc
+
+usage() {
+	echo "usage: $BASENAME [-phv] [path to user file]"
+}
+
+while getopts p:h:v: optvar; do
+	case $optvar in
+		p) default_password=${OPTARG} ;;
+		h) echo "!!" ;;
+		v) input_file=${OPTARG} && echo "!!: ${OPTARG}" ;;
+		*) usage && exit 1 ;;
+	esac
+done
+
+cat $1 | while read username groupname name_first name_last ; do
+	echo User: $username
+	echo Group: $groupname
+	echo Name: $name_first $name_last
+done
+
+echo $default_password
