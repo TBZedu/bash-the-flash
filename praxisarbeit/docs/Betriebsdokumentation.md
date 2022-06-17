@@ -68,7 +68,9 @@ TODO: Wie sind User-Home-Templates einzurichten
 
 ....
 
-## Bediensanleitung Benutzer
+## Bedienungsanleitung Benutzer
+
+### User Creation (buc)
 
 TODO: Erzeugen der Input-Files beschreiben, falls noetig
 
@@ -78,3 +80,48 @@ TODO: beschreiben der erzeugt files (falls solche erzeugt werden)
 
 TODO: Lokation von logfiles und bekannte Fehlermeldungen beschreiben.
 
+### Backup (bub)
+
+#### Erstellen der Input Dateien
+
+Alle zu sichernden Gruppen, eine pro Zeile, in eine Datei schreiben
+([Beispiel](../etc/bub.conf)). Sicherstellen, dass die Konfigurations-Variable
+`BACKUP_GROUPS_FILE` gesetzt ist und auf die Datei zeigt.
+
+Alternativ die Gruppennamen über die Kommandozeile übergeben:
+
+```sh
+# All valid syntax
+bub -g root --group wheel
+bub -g=root,wheel
+bub --group=wheel,root,test
+```
+
+#### Aufruf des Skriptes
+
+Für eine Hilfe zu den erlaubten Kommandozeilen-Argumente `bub --help` ausführen.
+
+Für die aktuelle Version `bub --version`. (Achtung, keine Kurzform. `bub -v`
+bedeutet "verbose", dasselbe wie `bub -v=D`)
+
+Werden die Hilfe-, oder Versionsparameter übergeben, werden alle anderen
+Parameter ignoriert, Ausführung wird nach ausgeben der Hilfe oder Version
+direkt beendet.
+
+Flaggen haben normalerweise (mit Ausnahme von `--version`) eine kurze (`-g`)
+und eine lange (`--group`) Form.
+
+Flaggen die ein Argument erwarten, können dies entweder mit einem Space oder
+einem Gleichzeichen erhalten.
+
+```sh
+bub -g root
+bub -g=root
+```
+
+#### Erzeugte Dateien
+
+Während der Ausführung wird eine temporäre Datei unter `/tmp/` erstellt. Diese
+wird lediglich als Input zu `tar` gebraucht.
+
+Logfiles werden unter `var/bub.log` gespeichert.
