@@ -119,6 +119,9 @@ bub -g root
 bub -g=root
 ```
 
+Weitere Informationen können in der man page (`man -l man/bub.1`) gefunden
+werden. ([man](../man/))
+
 #### Erzeugte Dateien
 
 Während der Ausführung wird eine temporäre Datei unter `/tmp/` erstellt. Diese
