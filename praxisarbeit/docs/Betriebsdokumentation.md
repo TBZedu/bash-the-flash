@@ -55,14 +55,14 @@ DEFAULT_PASSWORD="$(pwgen -s1 30)"
 crontab -e
 ```
 
-Paste the following content:
+Folgenden Inhalt einfügen:
 
 ```
 0 0 * * * /opt/bucb/bub
 ```
 
 Dies führt den Befehl `/opt/bucb/bub` zur nullten Minute, nullten Stunde jeden
-Tag (alle 24h) aus.
+Tag (also alle 24h um Mitternacht) aus.
 
 TODO: Wie sind User-Home-Templates einzurichten
 
@@ -124,4 +124,4 @@ bub -g=root
 Während der Ausführung wird eine temporäre Datei unter `/tmp/` erstellt. Diese
 wird lediglich als Input zu `tar` gebraucht.
 
-Logfiles werden unter `var/bub.log` gespeichert.
+Logfiles werden unter `var/bub.log` [Beispiel](../var/bub.log) gespeichert.
