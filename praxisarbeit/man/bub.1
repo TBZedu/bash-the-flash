@@ -14,14 +14,14 @@
 . ftr VB CB
 . ftr VBI CBI
 .\}
-.TH "bub" "1" "June 2022" "bub 1.0.1" ""
+.TH "bub" "1" "June 2022" "bub 1.1.0" ""
 .hy
 .SH NAME
 .PP
 bub - Bulk backup users\[cq] home directories.
 .SH SYNOPSIS
 .PP
-\f[B]bub\f[R] [\f[I]ARGUMENTS\f[R]] [\f[I]INPUTFILE\f[R]]
+\f[B]bub\f[R] [\f[I]INPUTFILE\f[R]] [\f[I]ARGUMENTS\f[R]]
 .SH DESCRIPTION
 .PP
 \f[B]bub\f[R], short for \[lq]Bulk User Backup\[rq] creates tar archives
@@ -34,6 +34,11 @@ are set, \f[B]bub\f[R] will exit immediately after printing the help or
 version information.
 .PP
 This script must be run as root.
+.SH INPUT FILE
+.PP
+A file containing a list of groups to backup.
+This overwrites the input file specified in the configuration, and is
+itself overwritten by the \f[B]-g\f[R]|\f[B]\[en]group\f[R] flag.
 .SH OPTIONS
 .TP
 \f[B]-h\f[R], \f[B]\[en]help\f[R]
@@ -80,6 +85,10 @@ Be verbose.
 **bub -e *bash*,*_hidden**
 Exclude all files containing \f[I]bash\f[R] or \f[I]_hidden\f[R] in
 their file name.
+.TP
+\f[B]bub my_groups -k 3\f[R]
+Read backup groups from \f[I]my_groups\f[R] and only keep the latest
+three backups.
 .SH EXIT VALUES
 .TP
 \f[B]0\f[R]

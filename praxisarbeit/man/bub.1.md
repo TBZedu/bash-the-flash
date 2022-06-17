@@ -1,4 +1,4 @@
-% bub(1) bub 1.0.1
+% bub(1) bub 1.1.0
 % Colin van Loo
 % June 2022
 
@@ -8,7 +8,7 @@ bub - Bulk backup users' home directories.
 
 # SYNOPSIS
 
-**bub** [*ARGUMENTS*] [*INPUTFILE*]
+**bub** [*INPUTFILE*] [*ARGUMENTS*]
 
 # DESCRIPTION
 
@@ -20,6 +20,12 @@ If the **-h**|**--help** or **--version** flags are set, **bub** will exit
 immediately after printing the help or version information.
 
 This script must be run as root.
+
+# INPUT FILE
+
+A file containing a list of groups to backup. This overwrites the input file
+specified in the configuration, and is itself overwritten by the
+**-g**|**--group** flag.
 
 # OPTIONS
 
@@ -65,6 +71,9 @@ configuration file.
 
 **bub -e \*bash\*,\*_hidden**
 : Exclude all files containing *bash* or *\_hidden* in their file name.
+
+**bub my_groups -k 3**
+: Read backup groups from *my_groups* and only keep the latest three backups.
 
 # EXIT VALUES
 
