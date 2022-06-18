@@ -39,6 +39,16 @@ This script must be run as root.
 A file containing a list of groups to backup.
 This overwrites the input file specified in the configuration, and is
 itself overwritten by the \f[B]-g\f[R]|\f[B]\[en]group\f[R] flag.
+.SH IGNORE FILE
+.PP
+Files following a certain pattern may be excluded from backup by
+specifying the pattern with the \f[B]-e\f[R]|\f[B]\[en]exclude\f[R]
+flag.
+.PP
+Users may also specify their own exclude patterns by placing a file
+named \f[B]bub.ignore\f[R] into any directory.
+The exclude patterns read from the ignore file will be applied
+recursively, starting from the directory where the ignore file lies.
 .SH OPTIONS
 .TP
 \f[B]-h\f[R], \f[B]\[en]help\f[R]
@@ -48,7 +58,7 @@ Display help information and exit immediately.
 Print version and exit immediately.
 .TP
 \f[B]\[en]config \f[BI]FILE\f[B]\f[R]
-Read cofig from FILE
+Read config from FILE
 .TP
 \f[B]-g \f[BI]GROUP\f[B]\f[R], \f[B]\[en]group \f[BI]GROUP\f[B]\f[R]
 Backup users part of \f[I]GROUP\f[R](s).
@@ -104,6 +114,7 @@ Invalid configuration file
 Other error
 .SH BUGS
 .PP
-Lol.
+My software has no bugs.
+It develops random features.
 .SH AUTHORS
 Colin van Loo.

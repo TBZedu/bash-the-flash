@@ -97,6 +97,31 @@ bub -g=root,wheel
 bub --group=wheel,root,test
 ```
 
+Nutzer haben die Möglichkeit einige ihrer Dateien aus dem Backup
+auszuschliessen. Dafür kann eine Datei "bub.ignore" Muster (Regex) enthalten.
+Sollte eine Datei aus dem selben oder tieferen Directories mit einem dieser
+Muster übereinstimmen, wird es vom Backup ignoriert.
+
+```
+# /home/müller/bub.ignore
+*.bash*
+```
+
+Mit dem obigen Beispiel würde die Datei `~müller/.bashrc` ignoriert werden.
+Nicht aber zum Beispiel die Datei `~peter/.bashrc`, da diese sich nicht in
+einem Subdirectory zum `bub.ignore` befindet.
+
+```
+/home
+  /müller
+    bub.ignore # Spezifiziert `*bash*`
+    .bashrc    # Ignoriert
+    /test
+      bash_test # Ignoriert
+  /peter
+    .bashrc    # Nicht Ignoriert
+```
+
 #### Aufruf des Skriptes
 
 Für eine Hilfe zu den erlaubten Kommandozeilen-Argumente `bub --help` ausführen.

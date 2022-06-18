@@ -36,6 +36,12 @@ usage() {
     echo '    -k|--keep                    number of backups to keep, must be greater than 0'              >&2
     echo '    -v[=LEVEL]|--verbose[=LEVEL] log verbosity (D|I|W|E), if no LEVEL provided, then D'          >&2
     echo ''                                                                                                >&2
+    echo 'IGNORE FILE:'                                                                                    >&2
+    echo '    If a directory contains a file bub.ignore, with a pattern'                                   >&2
+    echo '    specified on each line, all files in that and subsequent'                                    >&2
+    echo '    directories matching one of the patterns are excluded from'                                  >&2
+    echo '    backup.'                                                                                     >&2
+    echo ''                                                                                                >&2
     echo 'EXIT CODES:'                                                                                     >&2
     echo '    0   Success'                                                                                 >&2
     echo '    1   Require root permissions'                                                                >&2

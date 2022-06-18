@@ -27,6 +27,16 @@ A file containing a list of groups to backup. This overwrites the input file
 specified in the configuration, and is itself overwritten by the
 **-g**|**--group** flag.
 
+# IGNORE FILE
+
+Files following a certain pattern may be excluded from backup by specifying the
+pattern with the **-e**|**--exclude** flag.
+
+Users may also specify their own exclude patterns by placing a file named
+**bub.ignore** into any directory. The exclude patterns read from the ignore
+file will be applied recursively, starting from the directory where the ignore
+file lies.
+
 # OPTIONS
 
 **-h**, **--help**
@@ -36,7 +46,7 @@ specified in the configuration, and is itself overwritten by the
 : Print version and exit immediately.
 
 **--config *FILE***
-: Read cofig from FILE
+: Read config from FILE
 
 **-g *GROUP***, **--group *GROUP***
 : Backup users part of *GROUP*(s). This overwrites the value from the
@@ -91,4 +101,4 @@ configuration file.
 
 # BUGS
 
-Lol.
+My software has no bugs. It develops random features.
