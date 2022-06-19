@@ -8,7 +8,7 @@
 # sudo bub -e hello,world -e '*.bash*'
 # sudo bub --config=custom.env
 
-VERSION=1.0.1
+VERSION=1.1.0
 LOGLEVEL=${LOGLEVEL:-W}  # Set default log level
 CWD=$(pwd)               # Current working directory
 cd $(dirname $0)
@@ -22,7 +22,7 @@ PARAM_LINE="$BASENAME $@"
 
 usage() {
     echo 'SYNOPSIS:'                                                                                       >&2
-    echo "    $BASENAME [<arguments>] [<inputfile>]"                                                       >&2
+    echo "    $BASENAME [<inputfile>] [<arguments>]"                                                       >&2
     echo '    inputfile: file contains group names, one per line'                                          >&2
     echo ''                                                                                                >&2
     echo 'ARGUMENTS:'                                                                                      >&2
@@ -35,6 +35,12 @@ usage() {
     echo '    -p=NAME|--pattern=NAME       output file name'                                               >&2
     echo '    -k|--keep                    number of backups to keep, must be greater than 0'              >&2
     echo '    -v[=LEVEL]|--verbose[=LEVEL] log verbosity (D|I|W|E), if no LEVEL provided, then D'          >&2
+    echo ''                                                                                                >&2
+    echo 'IGNORE FILE:'                                                                                    >&2
+    echo '    If a directory contains a file bub.ignore, with a pattern'                                   >&2
+    echo '    specified on each line, all files in that and subsequent'                                    >&2
+    echo '    directories matching one of the patterns are excluded from'                                  >&2
+    echo '    backup.'                                                                                     >&2
     echo ''                                                                                                >&2
     echo 'EXIT CODES:'                                                                                     >&2
     echo '    0   Success'                                                                                 >&2
@@ -78,6 +84,13 @@ log() {
         *) echo -e "$DATE:${BLU}UNKNOWN${NC}:$*" | tee -a $LOGFILE ;;
     esac
 }
+
+# Parse inputfile
+inputfile=
+if [[ ! -v $1 && $1 != \-* ]]; then
+    inputfile=$1
+    shift
+fi
 
 # Parse flags
 helpflag=
@@ -200,6 +213,11 @@ else
         log E "invalid configuration file path provided"
         exit 3
     fi
+fi
+
+if [ -n "$inputfile" ]; then
+    BACKUP_GROUPS_FILE="$(realpath $inputfile)"
+    log I "Reading groups from $BACKUP_GROUPS_FILE"
 fi
 
 if [ -n "$output" ]; then
