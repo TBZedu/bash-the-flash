@@ -53,37 +53,7 @@ version() {
     echo "bub - Bulk User Backup v$VERSION"
 }
 
-log() {
-    local RED='\033[0;31m'
-    local YEL='\033[1;33m'
-    local WHI='\033[1;37m'
-    local CYA='\033[0;36m'
-    local BLU='\033[0;34m'
-    local NC='\033[0m'
-    DATE=$(date '+%Y.%m.%d %H:%M:%S')
-    LEVEL=$1
-    shift # Shift all parameters n+1, so that we can echo all further
-          # parameters without echoing the log level (which was stored in $1)
-    case $LEVEL in
-        D)
-            case $LOGLEVEL in
-                D) echo -e "$DATE:${CYA}DEBUG${NC}:$*" | tee -a $LOGFILE ;;
-            esac
-            ;;
-        I)
-            case $LOGLEVEL in
-                D|I) echo -e "$DATE:${WHI}INFO${NC}:$*" | tee -a $LOGFILE ;;
-            esac
-            ;;
-        W)
-            case $LOGLEVEL in
-                D|I|W) echo -e "$DATE:${YEL}WARNING${NC}:$*" | tee -a $LOGFILE ;;
-            esac
-            ;;
-        E) echo -e "$DATE:${RED}ERROR${NC}:$*" | tee -a $LOGFILE ;;
-        *) echo -e "$DATE:${BLU}UNKNOWN${NC}:$*" | tee -a $LOGFILE ;;
-    esac
-}
+. bucb.utils
 
 # Parse inputfile
 inputfile=
