@@ -12,6 +12,9 @@ usage() {
 	echo "usage: $BASENAME [-phv] [path to user file]"
 }
 
+# TODO: Add a log function (Es soll ein logfile mit einem einheitlichen Format geschrieben werden.)
+source ./bucb.utils
+
 source $ETCDIR/bucb.env
 
 while getopts p:h:v: optvar; do
@@ -23,16 +26,24 @@ while getopts p:h:v: optvar; do
 	esac
 done
 
-echo "$DEFAULT_PASSWORD"
-
 cat $1 | while read username groupname name_first name_last ; do
-	if [ ! $(getent group "$groupname") ]; then
-		addgroup $groupname
-		echo "[WARNING] Group $groupname does not exist!"
+
+  if [ "$(getent passwd $user)" ]; then
+    echo "User already exists" # ! Es soll eine Warnung ausgeben falls der User schon existiert...
+
+    if [ "$(getent passwd $user | cut -d: -f6)" ]; then
+      echo "Create user home..." # TODO: ...und das User-Home-Verzeichnis nicht soll es mit dir Skeleton-Template-Umgebung erstellt werden.
+    fi
+
+    continue # ! dann nichts tun
+  fi
+
+	if [ ! $(getent group "$groupname") ]; then 
+		addgroup $groupname # ! Es soll eine neue Gruppe anlegen falls die Gruppe noch nicht existiert
+		echo "[WARNING] Group $groupname does not exist! Creating new group." # ! Es soll prüfen, ob die Gruppe mit dem existiert, falls nicht eine Warnung ausgeben.
 	fi
-	useradd "$username" -c "$name_first $name_last" -G "$groupname" -p "$(openssl passwd -1 $DEFAULT_PASSWORD)"
-	#echo "Adding user $name_first $name_last as $username, member of $groupname" >> $LOGDIR/buc.log
-	# TODO: Replace with a log function
 
+  # TODO: Show a warning in case the user's group homes are not being backed-up by bulk user backup. (Es soll überprüfen ob die Gruppe eine der Gruppen ist, die im Skript 2 auch gesichert werden. Ansonsten soll eine Warnung ausgegeben werden, dass das Userhome nicht gesichert wird.)
+
+	useradd "$username" -c "$name_first $name_last" -G "$groupname" -p "$(openssl passwd -1 $DEFAULT_PASSWORD)" # TODO: Use skel for home and FIX: default password (Es soll je nach Gruppe einer anderer Skeleton-Template-Umgebung das User-Home-Verzeichnis einrichten) AND (Es soll ein konfigurierbares default passwort setzen, welches beim ersten login geändert werden muss)
 done
-
