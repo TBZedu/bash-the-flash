@@ -8,7 +8,7 @@
 # sudo bub -e hello,world -e '*.bash*'
 # sudo bub --config=custom.env
 
-VERSION=1.1.0
+VERSION=1.2.0
 LOGLEVEL=${LOGLEVEL:-W}  # Set default log level
 CWD=$(pwd)               # Current working directory
 cd $(dirname $0)
@@ -56,9 +56,9 @@ version() {
 . $BINDIR/bucb.utils
 
 # Parse inputfile
-# We treat the first argument as a file if it doesn't start with a '-' (dash).
+# Check if first argument is a file.
 inputfile=
-if [[ ! -v $1 && $1 != \-* ]]; then
+if [[ -f $1 ]]; then
     inputfile=$1
     shift
 fi
@@ -290,7 +290,8 @@ if tar -cvf "$BACKUP_NAME.tar"\
     --exclude-ignore-recursive=bub.ignore\
     $exclude_flags\
     -T $backup_dirs\
-    `# Tar might interpret some file paths as remote urls otherwise.`\
+    `# Tar might interpret some file paths (e.g. containing colons ':') as`\
+    `# remote urls otherwise.`\
     --force-local\
     > /dev/null 2>&1
 then
