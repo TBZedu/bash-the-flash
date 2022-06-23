@@ -101,9 +101,14 @@ Weitere Informationen können in der man page (`man -l man/buc.1`) gefunden werd
 
 Das Logfile befindet sich unter `var/buc.log`.
 
-Fehlermeldungen:
+Bei erfolgreicher Ausführung beträgt der Exit-Code (`$?`) 0.
 
-- insufficient permissions, script must be run as root
+Exit Code | Beschreibung
+--------- | ------------
+0         | Erfolgreich
+1         | Keine Root-Berechtigungen
+2         | Invalide(s) Argument(e)
+255       | Unbekannter Fehler aufgetreten
 
 ### Backup (bub)
 
