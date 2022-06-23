@@ -14,9 +14,6 @@ buc - Bulk create new user accounts.
 
 **buc**, short for "Bulk User Creation" creates multiple users based on an input file.
 
-If the **-h**|**--help** or **--version** flags are set, **bub** will exit
-immediately after printing the help or version information.
-
 This script must be run as root.
 
 # INPUT FILE
