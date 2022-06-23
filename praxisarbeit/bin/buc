@@ -49,11 +49,11 @@ cat $1 | while read username groupname name_first name_last ; do
   if [ "$(getent passwd $username)" ]; then
     log W "user ($username) already exists"
 
-    if [ ! "$(getent passwd $username | cut -d: -f6)" ]; then
+    if [ ! -d "/home/$username" ]; then
       log W "user ($username) has no home"
       log I "creating new home for user ($username), based on skeleton ($HOME_SKEL_DIR)"
-      usermod -d /home/$username -m $username
-      cp -r HOME_SKEL_DIR/* /home/$username
+      usermod -d /home/$username -m $username > /dev/null
+      mkdir /home/$username && cp -r $HOME_SKEL_DIR/* /home/$username
     fi
 
     continue
