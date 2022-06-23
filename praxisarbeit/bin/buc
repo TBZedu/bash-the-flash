@@ -3,47 +3,74 @@
 cwd=`pwd`
 cd `dirname $0`	
 BINDIR=`pwd`
+LOGLEVEL=${LOGLEVEL:-D}
 cd $cwd	
 BASENAME=`basename $0`
-LOGDIR=$BINDIR/../var
+LOGFILE=$BINDIR/../var/buc.log
 ETCDIR=$BINDIR/../etc
 
 usage() {
 	echo "usage: $BASENAME [-phv] [path to user file]"
 }
 
-# TODO: Add a log function (Es soll ein logfile mit einem einheitlichen Format geschrieben werden.)
-source ./bucb.utils
-
-source $ETCDIR/bucb.env
+. bucb.utils
+. $ETCDIR/bucb.env
 
 while getopts p:h:v: optvar; do
 	case $optvar in
 		p) DEFAULT_PASSWORD=${OPTARG} ;;
-		h) echo "!!" ;;
-		v) input_file=${OPTARG} && echo "!!: ${OPTARG}" ;;
+		v)
+      if [[ $2 == "D" || $2 == "I" || $2 == "W" || $2 == "E" ]]; then
+        LOGLEVEL=$2
+      else
+        LOGLEVEL=D
+      fi
+    ;;
 		*) usage && exit 1 ;;
 	esac
 done
 
+if [ ! -f "$1" ]; then
+  usage
+fi
+
+if [ $EUID -ne 0 ]; then
+  log E "insufficient permissions, script must be run as root"
+  exit 1
+fi
+
 cat $1 | while read username groupname name_first name_last ; do
 
-  if [ "$(getent passwd $user)" ]; then
-    echo "User already exists" # ! Es soll eine Warnung ausgeben falls der User schon existiert...
-
-    if [ "$(getent passwd $user | cut -d: -f6)" ]; then
-      echo "Create user home..." # TODO: ...und das User-Home-Verzeichnis nicht soll es mit dir Skeleton-Template-Umgebung erstellt werden.
-    fi
-
-    continue # ! dann nichts tun
+  HOME_SKEL_DIR="/etc/skel"
+  if [ -d "$ETCDIR/skeleton/$groupname" ]; then
+    HOME_SKEL_DIR="$ETCDIR/skeleton/$groupname"
   fi
 
-	if [ ! $(getent group "$groupname") ]; then 
-		addgroup $groupname # ! Es soll eine neue Gruppe anlegen falls die Gruppe noch nicht existiert
-		echo "[WARNING] Group $groupname does not exist! Creating new group." # ! Es soll prüfen, ob die Gruppe mit dem existiert, falls nicht eine Warnung ausgeben.
+  if [ "$(getent passwd $username)" ]; then
+    log W "User ($username) already exists"
+
+    if [ ! "$(getent passwd $username | cut -d: -f6)" ]; then
+      log W "User ($username) has no home; creating new home dir"
+      usermod -d /home/$username -m $username
+      cp -r HOME_SKEL_DIR/* /home/$username
+    fi
+
+    continue
+  fi
+
+	if [ ! "$(getent group $groupname)" ]; then 
+		groupadd $groupname 
+		log W "Group ($groupname) does not exist! Creating new group."
 	fi
 
-  # TODO: Show a warning in case the user's group homes are not being backed-up by bulk user backup. (Es soll überprüfen ob die Gruppe eine der Gruppen ist, die im Skript 2 auch gesichert werden. Ansonsten soll eine Warnung ausgegeben werden, dass das Userhome nicht gesichert wird.)
+  if [ ! "$(grep ^$groupname$ $ETCDIR/bub.conf)" ]; then
+    log W "The home directory is not backed-up since, group ($groupname) is not being backed up by bulk user backup"
+  fi
 
-	useradd "$username" -c "$name_first $name_last" -G "$groupname" -p "$(openssl passwd -1 $DEFAULT_PASSWORD)" # TODO: Use skel for home and FIX: default password (Es soll je nach Gruppe einer anderer Skeleton-Template-Umgebung das User-Home-Verzeichnis einrichten) AND (Es soll ein konfigurierbares default passwort setzen, welches beim ersten login geändert werden muss)
+	useradd "$username" -m -c "$name_first $name_last" -G "$groupname" -p "$(openssl passwd -1 '$DEFAULT_PASSWORD')" -k "$HOME_SKEL_DIR"
+  passwd --expire "$username" > /dev/null
+  log I "User ($username <$name_first $name_last>), belonging to group ($groupname), created with home template ($HOME_SKEL_DIR)"
 done
+
+log I "logs written to $LOGFILE"
+echo "-----------------------------------------------------------------------" >> $LOGFILE
