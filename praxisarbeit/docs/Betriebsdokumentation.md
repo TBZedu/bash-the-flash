@@ -177,4 +177,4 @@ werden. ([man](../man/))
 Während der Ausführung wird eine temporäre Datei unter `/tmp/` erstellt. Diese
 wird lediglich als Input zu `tar` gebraucht.
 
-Logfiles werden unter `var/bub.log` [Beispiel](../var/bub.log) gespeichert.
+Logfiles werden unter `var/bub.log` [hier](../var/) gespeichert.
