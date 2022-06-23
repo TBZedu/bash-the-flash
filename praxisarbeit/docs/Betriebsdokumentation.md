@@ -64,21 +64,46 @@ Folgenden Inhalt einfügen:
 Dies führt den Befehl `/opt/bucb/bub` zur nullten Minute, nullten Stunde jeden
 Tag (also alle 24h um Mitternacht) aus.
 
-TODO: Wie sind User-Home-Templates einzurichten
+#### User-Home-Templates Einrichtung
 
-....
+Um Gruppen spezifische User-Home-Templates zu erstellen muss man ein Verzeichnis mit dem Namen der Gruppe in `etc/skeleton` erstellen. Darin kann man dann die Template Konfiguration für alle Benutzer der Gruppe vornehmen. Beispiel für eine Gruppe namens "verkauf": `etc/skeleton/verkauf`
 
 ## Bedienungsanleitung Benutzer
 
 ### User Creation (buc)
 
-TODO: Erzeugen der Input-Files beschreiben, falls noetig
+#### Erstellen der Input Dateien
+Das Input-File muss folgendem Format entsprechen:
+```
+<username> <group> <vorname> <nachname>
+```
 
-TODO: beschreiben des Scriptaufruf
+#### Aufruf des Skriptes
 
-TODO: beschreiben der erzeugt files (falls solche erzeugt werden)
+Das Skript kann über...
+```sh
+buc <input-file> <flags>
+```
+... ausgeführt werden.
 
-TODO: Lokation von logfiles und bekannte Fehlermeldungen beschreiben.
+Beispiel:
+```sh
+buc users -p siHh_r9spA2sw^r123
+```
+Dies würde die Benutzer mit dem Passwort "siHh_r9spA2sw^r123" erstellen. Dieses muss direkt nach der Anmeldung geändert werden.
+
+Bitte beachten, dass hier die [User-Home-Templates Einrichtung](####User-Home-Templates-Einrichtung) vollendet sein muss.
+
+Weitere Informationen können in der man page (`man -l man/buc.1`) gefunden werden. ([man](../man/))
+
+
+#### Logfile & Bekannte Fehlermeldungen
+
+Das Logfile befindet sich unter `var/buc.log`.
+
+Fehlermeldungen:
+
+- insufficient permissions, script must be run as root
 
 ### Backup (bub)
 
