@@ -53,7 +53,7 @@ version() {
     echo "bub - Bulk User Backup v$VERSION"
 }
 
-. bucb.utils
+. $BINDIR/bucb.utils
 
 # Parse inputfile
 # We treat the first argument as a file if it doesn't start with a '-' (dash).
