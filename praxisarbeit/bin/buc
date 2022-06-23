@@ -69,7 +69,7 @@ cat $1 | while read username groupname name_first name_last ; do
     log W "the home directory is not backed-up since, group ($groupname) is not being backed up by bulk user backup"
   fi
 
-	useradd "$username" -m -c "$name_first $name_last" -G "$groupname" -p "$(openssl passwd -1 '$DEFAULT_PASSWORD')" -k "$HOME_SKEL_DIR"
+	useradd "$username" -m -c "$name_first $name_last" -G "$groupname" -p $(openssl passwd -1 "$DEFAULT_PASSWORD") -k "$HOME_SKEL_DIR"
   passwd --expire "$username" > /dev/null
   log I "crated user ($username <$name_first $name_last>), with group ($groupname) and home-skel from ($HOME_SKEL_DIR)"
 done
