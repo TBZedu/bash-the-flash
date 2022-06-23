@@ -69,8 +69,8 @@ und darf maximal 16 Zeichen lang sein.
 
 Long Flag (--) | Short Flag (-) | Argumente | Beschreibung
 -------------- | -------------- | --------- | ------------
-               | p              | String    | Bestimmt das Standardpasswort für alle Benutzeraccounts welche erstellt werden.
-               | v              |           | Zeige verboser Output.
+none           | p              | String    | Bestimmt das Standardpasswort für alle Benutzeraccounts welche erstellt werden.
+none           | v              |           | Zeige verboser Output.
 
 #### Bulk Backup Users (bub)
 
