@@ -2,7 +2,7 @@
 title: Betriebsdokumentation
 author: Conese Dillan, van Loo Colin
 date: 2022-06-17
-lastmod: 2022-06-17
+lastmod: 2022-06-23
 ---
 
 # Betriebsdokumentation
