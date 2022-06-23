@@ -285,12 +285,12 @@ do
 done
 
 if tar -cvf "$BACKUP_NAME.tar"\
-    `# Read exclude patterns from bub.ignore files and apply them recursively` \
-    `# to all subdirectories.` \
+    `# Read exclude patterns from bub.ignore files and apply them recursively`\
+    `# to all subdirectories.`\
     --exclude-ignore-recursive=bub.ignore\
     $exclude_flags\
     -T $backup_dirs\
-    `# Tar might interpret some file paths as remote urls otherwise.` \
+    `# Tar might interpret some file paths as remote urls otherwise.`\
     --force-local\
     > /dev/null 2>&1
 then
