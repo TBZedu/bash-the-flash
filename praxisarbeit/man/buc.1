@@ -1,0 +1,53 @@
+.SH NAME
+.PP
+buc \- Bulk create new user accounts.
+.SH SYNOPSIS
+.PP
+\f[B]buc\f[R] [\f[I]INPUTFILE\f[R]] [\f[I]ARGUMENTS\f[R]]
+.SH DESCRIPTION
+.PP
+\f[B]buc\f[R], short for \[lq]Bulk User Creation\[rq] creates multiple
+users based on an input file.
+.PP
+If the \f[B]\-h\f[R]|\f[B]\[en]help\f[R] or \f[B]\[en]version\f[R] flags
+are set, \f[B]bub\f[R] will exit immediately after printing the help or
+version information.
+.PP
+This script must be run as root.
+.SH INPUT FILE
+.PP
+A file containing a list of users to create.
+.SH OPTIONS
+.TP
+.B \f[B]\-p \f[BI]PASSWORD\f[B]\f[R]
+Set a default password for all new users.
+The password must be changed after login.
+.TP
+.B \f[B]\-v [\f[BI](D|I|W|E)\f[B]]\f[R]
+Verbosity level.
+If no level provided, the \f[I]D\f[R] is used.
+.SH EXAMPLES
+.TP
+.B \f[B]buc \[ti]/Documents/users \-p s7kbaN2?20knBjpK9\f[R]
+Creates users based on the file \[ti]/Documents/users, with password
+s7kbaN2?20knBjpK9.
+.TP
+.B \f[B]buc \-v\f[R]
+Be verbose.
+.SH EXIT VALUES
+.TP
+.B \f[B]0\f[R]
+Success
+.TP
+.B \f[B]1\f[R]
+Not run as root
+.TP
+.B \f[B]2\f[R]
+Invalid arguments
+.TP
+.B \f[B]255\f[R]
+Other error
+.SH BUGS
+.PP
+My software has no bugs.
+It develops random features, the same way as bulk user backup.
