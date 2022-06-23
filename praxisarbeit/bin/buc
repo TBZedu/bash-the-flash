@@ -13,7 +13,7 @@ usage() {
 	echo "usage: $BASENAME [-phv] [path to user file]"
 }
 
-. bucb.utils
+. $BINDIR/bucb.utils
 . $ETCDIR/bucb.env
 
 while getopts p:h:v: optvar; do
