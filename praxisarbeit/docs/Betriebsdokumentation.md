@@ -66,13 +66,17 @@ Tag (also alle 24h um Mitternacht) aus.
 
 #### User-Home-Templates Einrichtung
 
-Um Gruppen spezifische User-Home-Templates zu erstellen muss man ein Verzeichnis mit dem Namen der Gruppe in `etc/skeleton` erstellen. Darin kann man dann die Template Konfiguration für alle Benutzer der Gruppe vornehmen. Beispiel für eine Gruppe namens "verkauf": `etc/skeleton/verkauf`
+Um Gruppen spezifische User-Home-Templates zu erstellen muss man ein
+Verzeichnis mit dem Namen der Gruppe in `etc/skeleton` erstellen. Darin kann
+man dann die Template Konfiguration für alle Benutzer der Gruppe vornehmen.
+Beispiel für eine Gruppe namens "verkauf": `etc/skeleton/verkauf`
 
 ## Bedienungsanleitung Benutzer
 
 ### User Creation (buc)
 
 #### Erstellen der Input Dateien
+
 Das Input-File muss folgendem Format entsprechen:
 ```
 <username> <group> <vorname> <nachname>
@@ -81,21 +85,27 @@ Das Input-File muss folgendem Format entsprechen:
 #### Aufruf des Skriptes
 
 Das Skript kann über...
+
 ```sh
 buc <input-file> <flags>
 ```
+
 ... ausgeführt werden.
 
 Beispiel:
+
 ```sh
 buc users -p siHh_r9spA2sw^r123
 ```
-Dies würde die Benutzer mit dem Passwort "siHh_r9spA2sw^r123" erstellen. Dieses muss direkt nach der Anmeldung geändert werden.
 
-Bitte beachten, dass hier die [User-Home-Templates Einrichtung](####User-Home-Templates-Einrichtung) vollendet sein muss.
+Dies würde die Benutzer mit dem Passwort "siHh_r9spA2sw^r123" erstellen. Dieses
+muss direkt nach der Anmeldung geändert werden.
 
-Weitere Informationen können in der man page (`man -l man/buc.1`) gefunden werden. ([man](../man/))
+Bitte beachten, dass hier die [User-Home-Templates
+Einrichtung](####User-Home-Templates-Einrichtung) vollendet sein muss.
 
+Weitere Informationen können in der man page (`man -l man/buc.1`) gefunden
+werden. ([man](../man/))
 
 #### Logfile & Bekannte Fehlermeldungen
 
@@ -133,7 +143,7 @@ Sollte eine Datei aus dem selben oder tieferen Directories mit einem dieser
 Muster übereinstimmen, wird es vom Backup ignoriert.
 
 ```
-# /home/müller/bub.ignore
+# In file /home/müller/bub.ignore
 *.bash*
 ```
 

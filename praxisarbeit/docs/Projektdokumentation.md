@@ -149,6 +149,9 @@ Das entsprechende PR kann
 
 ### Buc Benutzung
 
-Um es dem Benutzer einfacher zu gestalten, muss keine Konfigurationsdatei für die Home-Skeletons erstellt werden. Die Skeletons können nun ganz einfach in `etc/skeleton`, für jede Gruppe anhand des Gruppennamen, erstellt werden.
+Um es dem Benutzer einfacher zu gestalten, muss keine Konfigurationsdatei für
+die Home-Skeletons erstellt werden. Die Skeletons können nun ganz einfach in
+`etc/skeleton`, für jede Gruppe anhand des Gruppennamen, erstellt werden.
 
-Buc erlaubt nun nur noch 2 Argumente. Verbose (v) und Standard Passwort (p). Long flags sind für beide nicht vorhanden.
+Buc erlaubt nun nur noch 2 Argumente. Verbose (v) und Standard Passwort (p).
+Long flags sind für beide nicht vorhanden.
