@@ -2,7 +2,7 @@
 title: Projekt Dokumentation
 author: Conese Dillan, van Loo Colin
 date: 2022-05-20
-lastmod: 2022-06-17
+lastmod: 2022-06-23
 ---
 
 # Projekt Dokumentation
@@ -53,7 +53,7 @@ Erstelle viele Nutzer.
 Das input-file muss eine Datei nach dem folgenden Format entsprechen:
 
 ```
-<username> <groupname> <vorname nachname>
+<username> <groupname> <vorname> <nachname>
 ```
 
 Die einzelnen Worte sind durch Leerzeichen getrennt. Das erste Wort wird als
@@ -69,11 +69,8 @@ und darf maximal 16 Zeichen lang sein.
 
 Long Flag (--) | Short Flag (-) | Argumente | Beschreibung
 -------------- | -------------- | --------- | ------------
-config         |                | Dateipfad | Die zu verwendende Konfigurationsdatei.
-default-pw     | pw             | String    | Bestimmt das Standardpasswort für alle Benutzeraccounts welche erstellt werden.
-home-template  | ht             | group:dir | Definiert das Verzeichnis welches das Home-Template einer bestimmten Gruppe beinhaltet. Mehrere Tupels (group:dir) können übergeben werden.
-verbose        | v              |           | Zeige verboser Output.
-version        |                |           | Zeige Version an und beende sofort.
+               | p              | String    | Bestimmt das Standardpasswort für alle Benutzeraccounts welche erstellt werden.
+               | v              |           | Zeige verboser Output.
 
 #### Bulk Backup Users (bub)
 
