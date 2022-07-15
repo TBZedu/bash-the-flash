@@ -1,6 +1,6 @@
 # m122
 
-> DISCLAIMER: Make sure to fully understand the script and adjust it before using it! It may cause fatal damge if operated without understanding it correctly!
+> DISCLAIMER: Make sure to fully understand the actual code of the script and adjust it before using it! It may cause fatal damge if operated without understanding it correctly!
 
 ## [Praxisarbeit LB1](praxisarbeit)
 
